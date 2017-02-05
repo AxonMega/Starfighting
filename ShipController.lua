@@ -157,10 +157,11 @@ for _, controlV in ipairs(controlVs) do
 		newControl.TextColor3 = Color3.new(0, 0, 0)
 		newControl.TextScaled = true
 		newControl.TextWrapped = true
-		newControl.Parent = controls
 		newControl.TextXAlignment = Enum.TextXAlignment.Left
+		newControl.Parent = controls
 	end
 end
+controls.Position = UDim2.new(0, 20, 0.5, controls.Size.Y.Offset/-2)
 
 local function removeGuis() --removes the control and stats guis
 	controlGui:Destroy()
