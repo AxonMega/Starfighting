@@ -171,7 +171,7 @@ end
 
 local function onFalling(active)
 	if active then
-		if cState ~= "none" then
+		if cState ~= "none" and humanoid:GetState() ~= Enum.HumanoidStateType.Physics then
 			cNone()
 		end
 		playAnim(fallTrack)
