@@ -23,13 +23,11 @@ local cState = "none"
 local pi = math.pi
 local r1 = CFrame.Angles(pi/-2, pi/-2, pi/-2)
 local r2 = CFrame.Angles(pi/-2, pi/2, pi/2)
-local neckP = CFrame.new(neck.C0.x, neck.C0.y, neck.C0.z)
-local leftP = CFrame.new(leftShoulder.C0.x, leftShoulder.C0.y, leftShoulder.C0.z)
-local rightP = CFrame.new(rightShoulder.C0.x, rightShoulder.C0.y, rightShoulder.C0.z)
+local neckP = CFrame.new(neck.C0.p)
+local leftP = CFrame.new(leftShoulder.C0.p)
+local rightP = CFrame.new(rightShoulder.C0.p)
 
 humanoid.AutoRotate = false
-character:WaitForChild("Animate"):Destroy()
-character:WaitForChild("Sound"):Destroy()
 for _, child in ipairs(head:GetChildren()) do
 	if child:IsA("Sound") then
 		child:Destroy()
@@ -95,12 +93,12 @@ local function isGoodState(state)
 end
 
 local function isGreatState(state)
-	return (not(state == Enum.HumanoidStateType.Freefall or state == Enum.HumanoidStateType.Swimming))
+	return not(state == Enum.HumanoidStateType.Freefall or state == Enum.HumanoidStateType.Swimming)
 end
 
 local function isMoveKeyDown()
-	return (uis:IsKeyDown(Enum.KeyCode.W) or uis:IsKeyDown(Enum.KeyCode.A) or uis:IsKeyDown(Enum.KeyCode.S) or
-		uis:IsKeyDown(Enum.KeyCode.D))
+	return uis:IsKeyDown(Enum.KeyCode.W) or uis:IsKeyDown(Enum.KeyCode.A) or uis:IsKeyDown(Enum.KeyCode.S) or
+		uis:IsKeyDown(Enum.KeyCode.D)
 end
 
 local function rotate()
@@ -170,8 +168,8 @@ local function cNone()
 end
 
 local function onFalling(active)
-	if active then
-		if cState ~= "none" and humanoid:GetState() ~= Enum.HumanoidStateType.Physics then
+	if active and humanoid:GetState() ~= Enum.HumanoidStateType.Physics then
+		if cState ~= "none" then
 			cNone()
 		end
 		playAnim(fallTrack)
@@ -423,15 +421,15 @@ local function onTorsoChildAdded(child)
 		if child.Name == "Neck" then
 			neck = child
 			wait(0.1)
-			neckP = CFrame.new(neck.C0.x, neck.C0.y, neck.C0.z)
+			neckP = CFrame.new(neck.C0.p)
 		elseif child.Name == "Left Shoulder" then
 			leftShoulder = child
 			wait(0.1)
-			leftP = CFrame.new(leftShoulder.C0.x, leftShoulder.C0.y, leftShoulder.C0.z)
+			leftP = CFrame.new(leftShoulder.C0.p)
 		elseif child.Name == "Right Shoulder" then
 			rightShoulder = child
 			wait(0.1)
-			rightP = CFrame.new(rightShoulder.C0.x, rightShoulder.C0.y, rightShoulder.C0.z)
+			rightP = CFrame.new(rightShoulder.C0.p)
 		end
 	end
 end
