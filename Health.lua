@@ -1,6 +1,7 @@
 --scripted by AxonMega
 
 local character = script.Parent
+local player = game.Players:GetPlayerFromCharacter(character)
 local torso = character:WaitForChild("Torso")
 local humanoid = character:WaitForChild("Humanoid")
 local healing = false
@@ -14,9 +15,28 @@ local bodyparts = {
 	["Left Leg"] = {"Left Hip", Vector3.new(0, 1, 0), Vector3.new(-0.5, -1, 0), Vector3.new(0, 0, -90)},
 	["Right Leg"] = {"Right Hip", Vector3.new(0, 1, 0), Vector3.new(0.5, -1, 0), Vector3.new(0, 0, -90)}
 }
+local passcodeDamage = "--[[Evil Coasters 206827]]--"
+local passcodeDied = "--[[Pom-Pom of Eternal Flames 893779]]--"
+
+local takeDamageC = Instance.new("RemoteEvent")
+takeDamageC.Name = "TakeDamageC"
+takeDamageC.Parent = character
+local takeDamageS = Instance.new("BindableEvent")
+takeDamageS.Name = "TakeDamageS"
+takeDamageS.Parent = character
+
+local function onTakeDamageRequest(enemy, damage, passcode)
+	if enemy.TeamColor == player.TeamColor or humanoid.Health <= 0 or passcode ~= passcodeDamage then return end
+	humanoid:TakeDamage(damage)
+	if humanoid.Health <= 0 then
+		workspace["-PlayerDied-"]:Fire(enemy, player, passcodeDied)
+	end
+end
+
+takeDamageC.OnServerEvent:Connect(onTakeDamageRequest)
+takeDamageS.Event:Connect(onTakeDamageRequest)
 
 game:GetService("ContentProvider"):Preload(deadFace)
-character:WaitForChild("Health"):Destroy()
 torso.CustomPhysicalProperties = cpp
 character:WaitForChild("HumanoidRootPart").CustomPhysicalProperties = cpp
 for name, data in pairs(bodyparts) do
@@ -53,7 +73,7 @@ for name, data in pairs(bodyparts) do
 end
 
 local function canHeal()
-	return (humanoid.Health < humanoid.MaxHealth and humanoid.Health > 0)
+	return humanoid.Health < humanoid.MaxHealth and humanoid.Health > 0
 end
 
 local function heal()
@@ -70,31 +90,26 @@ end
 local function onDied()
 	humanoid.Health = 0
 	humanoid:UnequipTools()
-	game.Players.LocalPlayer.Backpack:ClearAllChildren()
-	if torso.Parent then
-		for _, child in ipairs(character:GetChildren()) do
-			if child:IsA("Accessory") and child:FindFirstChild("Handle") then
-				child.Handle.CanCollide = true
-			end
-		end
-		for _, ballSocket in ipairs(ballSockets) do
-			ballSocket.Enabled = true
-		end
-		if character:FindFirstChild("Head") and character.Head:FindFirstChild("face") then
-			character.Head.face.Texture = deadFace
-		end
-		if character:FindFirstChild("HumanoidRootPart") then
-			character.HumanoidRootPart:Destroy()
-		end
+	player.Backpack:ClearAllChildren()
+	if not torso.Parent then return end
+	for _, hat in ipairs(humanoid:GetAccessories()) do
+		hat.Handle.CanCollide = true
+	end
+	for _, ballSocket in ipairs(ballSockets) do
+		ballSocket.Enabled = true
+	end
+	if character:FindFirstChild("Head") and character.Head:FindFirstChild("face") then
+		character.Head.face.Texture = deadFace
+	end
+	if character:FindFirstChild("HumanoidRootPart") then
+		character.HumanoidRootPart:Destroy()
 	end
 end
 
 humanoid.HealthChanged:Connect(heal)
 humanoid.Died:Connect(onDied)
 
-wait(0.2)
-for _, child in ipairs(character:GetChildren()) do
-	if child:IsA("Accessory") then
-		child:WaitForChild("Handle").CustomPhysicalProperties = cpp
-	end
+wait(0.25)
+for _, hat in ipairs(humanoid:GetAccessories()) do
+	hat:WaitForChild("Handle").CustomPhysicalProperties = cpp
 end
