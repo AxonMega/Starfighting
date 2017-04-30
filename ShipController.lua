@@ -1,6 +1,6 @@
 --scripted by AxonMega
 
---DEFINE VARIABLES
+--DECLARE VARIABLES
 
 --essentials
 local ship = script:WaitForChild("MyShip").Value
@@ -132,10 +132,12 @@ end
 
 local controlGui = guiFolder.ShipControls:Clone()
 controlGui.Parent = pilot.PlayerGui
-local controls = controlGui:WaitForChild("Controls")
+local controlFrame = controlGui:WaitForChild("Controls")
+local controlToggleKey = controlGui:WaitForChild("ToggleKey")
 local statsGui = guiFolder.ShipStats:Clone()
 statsGui.Parent = pilot.PlayerGui
 local statsFrame = statsGui:WaitForChild("Stats")
+local statsToggleKey = statsGui:WaitForChild("ToggleKey")
 local healthBar = statsFrame:WaitForChild("HealthBar")
 local healthLabel = statsFrame:WaitForChild("HealthLabel")
 local speedBar = statsFrame:WaitForChild("SpeedBar")
@@ -144,13 +146,13 @@ local controlVs = ship.Controls:GetChildren()
 table.sort(controlVs, sortKeys)
 for _, controlV in ipairs(controlVs) do
 	if controlV.Value ~= "None" then
-		controls.Size = controls.Size + UDim2.new(0, 0, 0, 16)
+		controlFrame.Size = controlFrame.Size + UDim2.new(0, 0, 0, 16)
 		local newControl = Instance.new("TextLabel")
 		newControl.Name = controlV.Name
 		newControl.BackgroundTransparency = 1
 		newControl.BorderColor3 = Color3.new(0, 0, 0)
 		newControl.BorderSizePixel = 0
-		newControl.Position = UDim2.new(0, 0, 0, controls.Size.Y.Offset - 16)
+		newControl.Position = UDim2.new(0, 0, 0, controlFrame.Size.Y.Offset - 16)
 		newControl.Size = UDim2.new(1, 0, 0, 16)
 		newControl.Font = Enum.Font.SciFi
 		newControl.Text = controlV.Name .. " = " .. controlV.Value
@@ -158,10 +160,12 @@ for _, controlV in ipairs(controlVs) do
 		newControl.TextScaled = true
 		newControl.TextWrapped = true
 		newControl.TextXAlignment = Enum.TextXAlignment.Left
-		newControl.Parent = controls
+		newControl.Parent = controlFrame
 	end
 end
-controls.Position = UDim2.new(0, 20, 0.5, controls.Size.Y.Offset/-2)
+local yPos = controlFrame.Size.Y.Offset/-2
+controlFrame.Position = UDim2.new(0, 20, 0.5, yPos)
+controlToggleKey.Position = UDim2.new(0, 2, 0.5, yPos)
 
 local function removeGuis() --removes the control and stats guis
 	controlGui:Destroy()
@@ -171,11 +175,14 @@ end
 local function toggleControlGui() --toggles the visibility of the control gui
 	if controlGuiOn then
 		controlGuiOn = false
-		controlGui.Controls:TweenPosition(UDim2.new(0, -160, 0.5, -90), Enum.EasingDirection.Out, Enum.EasingStyle.Sine,
+		controlGui.Controls:TweenPosition(UDim2.new(0, -160, 0.5, yPos), Enum.EasingDirection.Out, Enum.EasingStyle.Sine,
 			0.5, true)
+		wait(0.5)
+		if not controlGuiOn then controlToggleKey.Visible = true end
 	else
 		controlGuiOn = true
-		controlGui.Controls:TweenPosition(UDim2.new(0, 20, 0.5, -90), Enum.EasingDirection.Out, Enum.EasingStyle.Sine,
+		controlToggleKey.Visible = false
+		controlGui.Controls:TweenPosition(UDim2.new(0, 20, 0.5, yPos), Enum.EasingDirection.Out, Enum.EasingStyle.Sine,
 			0.5, true)
 	end
 end
@@ -184,8 +191,11 @@ local function toggleStatsGui() --toggles the visibility of the stats gui
 	if statsGuiOn then
 		statsGuiOn = false
 		statsGui.Stats:TweenPosition(UDim2.new(1, 20, 0.625, -70), Enum.EasingDirection.Out, Enum.EasingStyle.Sine, 0.5, true)
+		wait(0.5)
+		if not statsGuiOn then statsToggleKey.Visible = true end
 	else
 		statsGuiOn = true
+		statsToggleKey.Visible = false
 		statsGui.Stats:TweenPosition(UDim2.new(1, -180 ,0.625, -70), Enum.EasingDirection.Out, Enum.EasingStyle.Sine, 0.5, true)
 	end
 end
@@ -308,6 +318,7 @@ local function stopMove() --stops the ship's motion
 	jetSound:Stop()
 	jetSound.PlaybackSpeed = 0.5
 	jetSound.Volume = 0.5
+	updateSpeedBar(0)
 	for _, thruster in ipairs(thrusters) do
 		thruster.JetGlow.Flames.Rate = 0
 		thruster.JetGlow.Flames.Enabled = false
@@ -362,9 +373,8 @@ local function deactivateRetro() --turns off the retro thrusters
 end
 
 local function updateThrusters() --changes the magnitude of the thrusters relative to the ship's speed
-	local change = acceleration*5
 	for _, thruster in ipairs(thrusters) do
-		thruster.JetGlow.Flames.Rate = thruster.JetGlow.Flames.Rate + change
+		thruster.JetGlow.Flames.Rate = thruster.JetGlow.Flames.Rate + acceleration*5
 	end
 	jetSound.PlaybackSpeed = 0.5 + (speed/maxSpeed)*1.5
 	jetSound.Volume = 0.5 + (speed/maxSpeed)*0.5
@@ -393,6 +403,10 @@ local function accelerate(newAcc) --changes the acceleration of the ship
 	acceleration = 0
 	if speed == 0  then
 		stopMove()
+	end
+	if not engineOn.Value then
+		speed = 0
+		updateSpeedBar(0)
 	end
 end
 
@@ -428,14 +442,14 @@ if hTurret1 then
 	turretStats.hbl, turretStats.hbe = createLaser(pilot.TeamColor, turretStats.ld, turretStats.lp)
 end
 
-local function fireTurret(turret, laser, effect, damage, speed) --causes the given turret to fire
+local function fireTurret(turret, laser, effect, damage, projSpeed) --causes the given turret to fire
 	local charge = turret.Charge
 	charge.Fire:Play()
 	laser.Parent = projFolder
 	local pos = charge.NozzlePoint.WorldPosition
 	local dir = charge.NozzlePoint.WorldAxis
 	laser.CFrame = CFrame.new(pos, pos + dir*10)*lasRot + dir*(laser.Size.X/2)
-	laser:WaitForChild("FlyPower").Velocity = dir*speed
+	laser:WaitForChild("FlyPower").Velocity = dir*projSpeed
 	enableLaser(pilot, laser, effect, ship, damage)
 end
 
@@ -461,14 +475,18 @@ end
 
 --MAIN
 
+local function resetButtons() --sets all the buttons back to the normal color
+	for _, button in ipairs(screen:GetChildren()) do
+		button.BackgroundColor3 = normColor
+	end
+end
+
 local function stopFunctions() --stops the ship's functions when the pilot ejects or the ship is destroyed or turned off
 	toggleCam(false)
 	toggleCharTransparency(0)
 	stopMove()
 	deactivateRetro()
-	for _, button in ipairs(screen:GetChildren()) do
-		button.BackgroundColor3 = normColor
-	end
+	resetButtons()
 	leftHinge.TargetAngle = 0
 	rightHinge.TargetAngle = 0
 end
@@ -482,7 +500,7 @@ local function togglePower() --toggles whether the ship is on or off
 			glowPart.Material = Enum.Material.SmoothPlastic
 		end
 		for i = 1, 40 do
-			if engineOn.Value or not canChange then return end
+			if engineOn.Value or not canChange then break end
 			hum.Volume = 1 - i/40
 			hum.PitchChange.Octave = 2 - i/20
 			wait(0.05)
@@ -498,7 +516,7 @@ local function togglePower() --toggles whether the ship is on or off
 		toggleCam(true)
 		hum:Play()
 		for i = 1, 40 do
-			if not engineOn.Value or not canChange then return end
+			if not engineOn.Value or not canChange then break end
 			hum.Volume = i/40
 			hum.PitchChange.Octave = i/20
 			wait(0.05)
@@ -507,14 +525,22 @@ local function togglePower() --toggles whether the ship is on or off
 end
 
 local function onPowerCutRequest(reason) --called when the pilot ejects or the ship is destroyed
-	canChange = false
-	if reason == "ejected" then
+	if reason == "crashed" then
+		if engineOn.Value and canChange then
+			togglePower()
+		end
+		return
+	elseif reason == "ejected" then
 		if engineOn.Value then
 			stopFunctions()
+		else
+			resetButtons()
 		end
 	elseif reason == "destroyed" then
 		if engineOn.Value then
 			togglePower()
+		else
+			resetButtons()
 		end
 	end
 	removeGuis()
