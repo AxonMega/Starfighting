@@ -32,6 +32,6 @@ local function onUnequipped()
 	mouse.Icon = ""
 end
 
+mouse.Button1Down:Connect(onButton1Down)
 sword.Equipped:Connect(onEquipped)
 sword.Unequipped:Connect(onUnequipped)
-mouse.Button1Down:Connect(onButton1Down)
