@@ -15,8 +15,8 @@ local bodyparts = {
 	["Left Leg"] = {"Left Hip", Vector3.new(0, 1, 0), Vector3.new(-0.5, -1, 0), Vector3.new(0, 0, -90)},
 	["Right Leg"] = {"Right Hip", Vector3.new(0, 1, 0), Vector3.new(0.5, -1, 0), Vector3.new(0, 0, -90)}
 }
-local passcodeDamage = "--[[Evil Coasters 206827]]--"
-local passcodeDied = "--[[Pom-Pom of Eternal Flames 893779]]--"
+local passcodeDamage = "secret"
+local passcodeDied = "secret"
 
 local takeDamageC = Instance.new("RemoteEvent")
 takeDamageC.Name = "TakeDamageC"
