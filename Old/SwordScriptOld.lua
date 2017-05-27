@@ -9,8 +9,8 @@ local equipped = false
 local striking = false
 local canStrike = false
 local hit = false
-local passcodeDamage = "--[[Evil Coasters 206827]]--"
-local passcodeDied = "--[[Pom-Pom of Eternal Flames 893779]]--"
+local passcodeDamage = "secret"
+local passcodeDied = "secret"
 local tracks = {}
 
 while #stats:GetChildren() < 4 do wait() end
