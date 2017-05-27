@@ -79,7 +79,7 @@ end
 gun.GunScript:WaitForChild("Ready")
 nozzlePoint, interval, lasRot, lasOff = rFunc:InvokeServer("get")
 
-gun.Equipped:Connect(onEquipped)
-gun.Unequipped:Connect(onUnequipped)
 mouse.Button1Down:Connect(onButton1Down)
 game:GetService("UserInputService").InputBegan:Connect(onInput)
+gun.Equipped:Connect(onEquipped)
+gun.Unequipped:Connect(onUnequipped)
