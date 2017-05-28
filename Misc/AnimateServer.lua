@@ -8,7 +8,7 @@ local neck = torso:WaitForChild("Neck")
 local leftShoulder = torso:WaitForChild("Left Shoulder")
 local rightShoulder = torso:WaitForChild("Right Shoulder")
 local hrp = character:WaitForChild("HumanoidRootPart")
-local gyro = nil
+local gyro
 local pi = math.pi
 local startCF = CFrame.new(0, 0, 0)*CFrame.Angles(pi/2, pi, 0)
 
@@ -18,14 +18,14 @@ local function empower(givenGyro)
 	givenGyro.MaxTorque = Vector3.new(0, 20000, 0)
 end
 
-local function onPropChange(_, option, ...)
-	if option == "rotate" then
+local function onPropChange(_, task, ...)
+	if task == "rotate" then
 		local rotateC, neckC0, leftC0, rightC0 = ...
 		gyro.CFrame = rotateC
 		neck.C0 = neckC0
 		leftShoulder.C0 = leftC0
 		rightShoulder.C0 = rightC0
-	elseif option == "createGyro" then
+	elseif task == "createGyro" then
 		gyro = Instance.new("BodyGyro")
 		gyro.Name = "RotatePower"
 		gyro.CFrame = character.Torso.CFrame
@@ -35,9 +35,9 @@ local function onPropChange(_, option, ...)
 		gyro.Parent = hrp
 		coroutine.resume(coroutine.create(empower), gyro)
 		return gyro
-	elseif option == "unequipTools" then
+	elseif task == "unequipTools" then
 		humanoid:UnequipTools()
-	elseif option == "cNone" then
+	elseif task == "cNone" then
 		humanoid.HipHeight = 0
 		humanoid.WalkSpeed = 16
 		torso:WaitForChild("StayJoint"):Destroy()
@@ -51,21 +51,21 @@ local function onPropChange(_, option, ...)
 			rootJoint.C1 = startCF
 			return rootJoint
 		end
-	elseif option == "resetJoints" then
+	elseif task == "resetJoints" then
 		neck.C0 = CFrame.new(0, 1, 0)*CFrame.Angles(pi/2, pi, 0)
 		leftShoulder.C0 = CFrame.new(-1, 0.5, 0)*CFrame.Angles(pi/-2, pi/-2, pi/-2)
 		rightShoulder.C0 = CFrame.new(1, 0.5, 0)*CFrame.Angles(pi/-2, pi/2, pi/2)
-	elseif option == "enableTool" then
+	elseif task == "enableTool" then
 		local tool, enabled = ...
 		tool.Enabled = enabled
-	elseif option == "makeStayJoint" then
+	elseif task == "makeStayJoint" then
 		local weld = Instance.new("Weld")
 		weld.Name = "StayJoint"
 		weld.Part0 = torso
 		weld.Part1 = hrp
 		weld.C1 = CFrame.new(0, 0, 0)*CFrame.Angles(pi/-8, 0, 0)
 		weld.Parent = torso
-	elseif option == "crouch" then
+	elseif task == "crouch" then
 		humanoid.HipHeight = -0.6
 		humanoid.WalkSpeed = 12
 		if torso:FindFirstChild("StayJoint") then
@@ -75,7 +75,7 @@ local function onPropChange(_, option, ...)
 		if hrp:FindFirstChild("RootJoint") then
 			hrp.RootJoint.C0 = CFrame.new(0, 0, 0)*CFrame.Angles(pi/2, pi, 0)
 		end
-	elseif option == "crawl" then
+	elseif task == "crawl" then
 		humanoid.HipHeight = -2
 		humanoid.WalkSpeed = 8
 		if torso:FindFirstChild("StayJoint") then
@@ -85,23 +85,23 @@ local function onPropChange(_, option, ...)
 		if hrp:FindFirstChild("RootJoint") then
 			hrp.RootJoint.C0 = CFrame.new(0, -0.4, 0)*CFrame.Angles(pi/2, pi, 0)
 		end
-	elseif option == "sprint" then
+	elseif task == "sprint" then
 		local currentTool = ...
 		humanoid.WalkSpeed = 32
 		if currentTool then
 			currentTool.Enabled = false
 		end
-	elseif option == "endSprint" then
+	elseif task == "endSprint" then
 		local currentTool = ...
 		humanoid.WalkSpeed = 16
 		if currentTool then
 			currentTool.Enabled = true
 		end
-	elseif option == "removeSeatWeld" then
+	elseif task == "removeSeatWeld" then
 		if torso:FindFirstChild("SeatWeld") then
 			torso.SeatWeld:Destroy()
 		end
-	elseif option == "newJoint" then
+	elseif task == "newJoint" then
 		local jointType, joint = ...
 		if jointType == "neck" then
 			neck = joint
