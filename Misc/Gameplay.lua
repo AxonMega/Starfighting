@@ -2,9 +2,9 @@
 
 --DECLARE VARIABLES
 
-local players = game:WaitForChild("Players")
+local players = game.Players
+local storage = game.ServerStorage
 local killfeedEvent = workspace:WaitForChild("-KillfeedEvent-")
-local storage = game:WaitForChild("ServerStorage")
 local modFolder = game.ServerScriptService:WaitForChild("GameplayModuleScripts")
 local adminUtils = require(modFolder:WaitForChild("AdminCommands"))
 local shipManager = require(modFolder:WaitForChild("ShipManager"))
@@ -13,7 +13,7 @@ local gear = storage:WaitForChild("Gear")
 local scripts = storage:WaitForChild("Scripts")
 local gun = gear:WaitForChild("Wasp-P2")
 local debris = game:GetService("Debris")
-local passcodeDied = "secret"
+local passcodeDied = "--[[Pom-Pom of Eternal Flames 893779]]--"
 local ms = game:GetService("MarketplaceService")
 local stats = {}
 local latestKillfeed = {}
