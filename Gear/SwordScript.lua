@@ -2,7 +2,7 @@
 
 local sword = script.Parent
 local stats = sword:WaitForChild("Stats")
-local setupSword = require(game:WaitForChild("ReplicatedStorage"):WaitForChild("ModuleScripts"):WaitForChild("SetupSword"))
+local setupSword = require(game.ReplicatedStorage:WaitForChild("ModuleScripts"):WaitForChild("SetupSword"))
 local user = sword.Parent.Parent
 local canHurt = false
 local hit = false
