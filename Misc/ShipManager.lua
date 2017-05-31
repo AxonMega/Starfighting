@@ -49,9 +49,7 @@ local function setupSpawner(spawner, spawners)
 				cp:Destroy()
 				setupManager:Clone().Parent = shipClone
 				local function onParentChanged(property)
-					if not shipClone.Parent then
-						ships[player.Name] = nil
-					end
+					ships[player.Name] = nil
 				end
 				shipClone:GetPropertyChangedSignal("Parent"):Connect(onParentChanged)
 			end
