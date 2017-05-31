@@ -48,12 +48,12 @@ local function setupSpawner(spawner, spawners)
 				shipClone:SetPrimaryPartCFrame(spawnZone.CFrame + Vector3.new(0, shipClone.PrimaryPart.Size.Y/2 + 4, 0))
 				cp:Destroy()
 				setupManager:Clone().Parent = shipClone
-				local function onChanged(property)
-					if property == "Parent" and not shipClone.Parent then
+				local function onParentChanged(property)
+					if not shipClone.Parent then
 						ships[player.Name] = nil
 					end
 				end
-				shipClone.Changed:Connect(onChanged)
+				shipClone:GetPropertyChangedSignal("Parent"):Connect(onParentChanged)
 			end
 			wait(1)
 			button.Transparency = 0.25
