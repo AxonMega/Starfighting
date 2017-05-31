@@ -15,12 +15,11 @@ local enableLaser = require(modFolder:WaitForChild("EnableLaser"))
 local health = stats.MaxHealth.Value
 local offset = Vector3.new(0, 5, 0)
 local lastSpeed = 20
-local lastOff = nil
+local lastOff
 local timer = 0
 local hover = Vector3.new(0, 0, 0)
 local hoverDir = 1
-local target = nil
-local targetTorso = nil
+local target, targetTorso
 local lastFire = 0
 local lasRot = CFrame.Angles(0, math.pi/2, 0)
 local passcodeDamage = "--[[Evil Coasters 206827]]--"
@@ -75,13 +74,11 @@ local function fire()
 	end
 end
 
-local function onAncestryChanged(_, newParent)
-	if not newParent then
-		robot:Destroy()
-	end
+local function onParentChanged()
+	robot:Destroy()
 end
 
-torso.AncestryChanged:Connect(onAncestryChanged)
+torso:GetPropertyChangedSignal("Parent"):Connect(onParentChanged)
 
 local function goodTarget(prospect)
 	local character = prospect.Character
@@ -97,7 +94,7 @@ end
 
 local function findTarget()
 	local minDistance = 80
-	local closest = nil
+	local closest
 	for _, prospect in ipairs(game.Players:GetPlayers()) do
 		if prospect.TeamColor ~= player.TeamColor then
 			local distance = goodTarget(prospect)
