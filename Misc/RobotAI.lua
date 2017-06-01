@@ -22,7 +22,7 @@ local hoverDir = 1
 local target, targetTorso
 local lastFire = 0
 local lasRot = CFrame.Angles(0, math.pi/2, 0)
-local passcodeDamage = "--[[Evil Coasters 206827]]--"
+local passcodeDamage = "secret"
 
 math.randomseed(tick())
 
