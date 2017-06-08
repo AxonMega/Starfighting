@@ -11,7 +11,7 @@ local ballSockets = {}
 local bodyparts = {
 	["Head"] = {"Neck", Vector3.new(0, -0.5, 0), Vector3.new(0, 1, 0), Vector3.new(0, 0, 90)},
 	["Left Arm"] = {"Left Shoulder", Vector3.new(0.5, 0.5, 0), Vector3.new(-1, 0.5, 0), Vector3.new(0, 180, 0)},
-	["Right Arm"] = {"Right Shoulder", Vector3.new(-0.5, 0.5, 0), Vector3.new(1, 0.5, 0), Vector3.new(0, 0, 0)},
+	["Right Arm"] = {"Right Shoulder", Vector3.new(-0.5, 0.5, 0), Vector3.new(1, 0.5, 0), Vector3.new()},
 	["Left Leg"] = {"Left Hip", Vector3.new(0, 1, 0), Vector3.new(-0.5, -1, 0), Vector3.new(0, 0, -90)},
 	["Right Leg"] = {"Right Hip", Vector3.new(0, 1, 0), Vector3.new(0.5, -1, 0), Vector3.new(0, 0, -90)}
 }
