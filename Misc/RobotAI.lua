@@ -17,7 +17,7 @@ local offset = Vector3.new(0, 5, 0)
 local lastSpeed = 20
 local lastOff
 local timer = 0
-local hover = Vector3.new(0, 0, 0)
+local hover = Vector3.new()
 local hoverDir = 1
 local target, targetTorso
 local lastFire = 0
