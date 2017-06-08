@@ -10,7 +10,7 @@ local rightShoulder = torso:WaitForChild("Right Shoulder")
 local hrp = character:WaitForChild("HumanoidRootPart")
 local gyro
 local pi = math.pi
-local startCF = CFrame.new(0, 0, 0)*CFrame.Angles(pi/2, pi, 0)
+local startCF = CFrame.new()*CFrame.Angles(pi/2, pi, 0)
 
 
 local function empower(givenGyro)
@@ -29,7 +29,7 @@ local function onPropChange(_, task, ...)
 		gyro = Instance.new("BodyGyro")
 		gyro.Name = "RotatePower"
 		gyro.CFrame = character.Torso.CFrame
-		gyro.MaxTorque = Vector3.new(0, 0, 0)
+		gyro.MaxTorque = Vector3.new()
 		gyro.P = 20000
 		gyro.D = 0
 		gyro.Parent = hrp
@@ -63,23 +63,23 @@ local function onPropChange(_, task, ...)
 		weld.Name = "StayJoint"
 		weld.Part0 = torso
 		weld.Part1 = hrp
-		weld.C1 = CFrame.new(0, 0, 0)*CFrame.Angles(pi/-8, 0, 0)
+		weld.C1 = CFrame.Angles(pi/-8, 0, 0)
 		weld.Parent = torso
 	elseif task == "crouch" then
 		humanoid.HipHeight = -0.6
 		humanoid.WalkSpeed = 12
 		if torso:FindFirstChild("StayJoint") then
-			torso.StayJoint.C0 = CFrame.new(0, 0, 0)*CFrame.Angles(pi/8, 0, 0)
-			torso.StayJoint.C1 = CFrame.new(0, 0, 0)
+			torso.StayJoint.C0 = CFrame.Angles(pi/8, 0, 0)
+			torso.StayJoint.C1 = CFrame.new()
 		end
 		if hrp:FindFirstChild("RootJoint") then
-			hrp.RootJoint.C0 = CFrame.new(0, 0, 0)*CFrame.Angles(pi/2, pi, 0)
+			hrp.RootJoint.C0 = CFrame.Angles(pi/2, pi, 0)
 		end
 	elseif task == "crawl" then
 		humanoid.HipHeight = -2
 		humanoid.WalkSpeed = 8
 		if torso:FindFirstChild("StayJoint") then
-			torso.StayJoint.C0 = CFrame.new(0, 0, 0)*CFrame.Angles(pi/2, 0, 0)
+			torso.StayJoint.C0 = CFrame.Angles(pi/2, 0, 0)
 			torso.StayJoint.C1 = CFrame.new(0, -0.4, 0)
 		end
 		if hrp:FindFirstChild("RootJoint") then
