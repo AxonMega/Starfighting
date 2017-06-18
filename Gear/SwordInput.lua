@@ -1,11 +1,12 @@
 --scripted by AxonMega
 
 local sword = script.Parent.Parent
-local rFunc = sword.SwordScript:WaitForChild("Function")
 local mouse = game.Players.LocalPlayer:GetMouse()
 local equipped = false
 local striking = false
 local canStrike = false
+local createCom = require(864775860)
+local com = createCom(script, script.Parent)
 
 local function isGood()
 	return sword.Enabled and equipped and canStrike and not striking
@@ -14,7 +15,7 @@ end
 local function onButton1Down()
 	if isGood() then
 		striking = true
-		rFunc:InvokeServer()
+		com:sendWR()
 		striking = false
 	end
 end
