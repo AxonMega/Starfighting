@@ -11,8 +11,7 @@ local createCom = require(864775860)
 local com = createCom(script, script.Parent)
 
 while not com.ready do wait() end
-local nozzlePoint, stats, lasRot, lasOff = com.nozzlePoint, com.stats, com.lasRot, com.lasOff
-local interval = 1/stats.FireRate.Value
+local interval = 1/com.stats.FireRate.Value
 
 local function isGood()
 	return gun.Enabled and equipped and canFire and not firing and not reloading.Value
@@ -34,8 +33,8 @@ local function fire()
 	firing = true
 	local mouseP = mouse.Hit.p
 	local laser = com:sendWR("fire", mouseP)
-	local nozzleP = nozzlePoint.WorldPosition
-	laser.CFrame = CFrame.new(nozzlePoint.WorldPosition, mouseP)*lasRot + (mouseP - nozzleP).unit*lasOff
+	local nozzleP = com.nozzlePoint.WorldPosition
+	laser.CFrame = CFrame.new(nozzleP, mouseP)*com.lasRot + (mouseP - nozzleP).unit*com.lasOff
 	local function onTouched(part)
 		if isBad(part) or part:IsDescendantOf(gun) then return end
 		laser.Transparency = 1
@@ -57,7 +56,7 @@ local function onButton1Down()
 end
 
 local function onInput(input, gpe)
-	if input.KeyCode == Enum.KeyCode.R and isGood() and not gpe and ammo.Value < stats.ClipSize.Value then
+	if input.KeyCode == Enum.KeyCode.R and isGood() and not gpe and ammo.Value < com.stats.ClipSize.Value then
 		reload()
 	end
 end
