@@ -13,14 +13,13 @@ local user = gun.Parent.Parent
 while #stats:GetChildren() < 5 do wait() end
 while #gun:GetChildren() < stats.ChildCount.Value do wait() end
 local nozzlePoint = gun.Handle:WaitForChild("NozzlePoint")
-local interval = 1/stats.FireRate.Value
 local glowPart = gun.GlowPart
 local ammo, reloading, fireSound, reloadSound = setupGun(gun, user.TeamColor, stats.Damage.Value, stats.FireRate.Value)
 local baseLaser, baseEffect = createLaser(user.TeamColor, stats.Damage.Value, stats.ProjectileSpeed.Value)
 local lasOff = baseLaser.Size.X/2
 ammo.Value = stats.ClipSize.Value
 
-local function onInvoke(_, task, mouseP)
+local function receiveWR(task, mouseP)
 	if task == "fire" then
 		fireSound:Play()
 		local laser = baseLaser:Clone()
@@ -41,14 +40,10 @@ local function onInvoke(_, task, mouseP)
 		ammo.Value = stats.ClipSize.Value
 		glowPart.Material = Enum.Material.Neon
 		reloading.Value = false
-	elseif task == "get" then
-		return nozzlePoint, interval, lasRot, lasOff	
 	end
 end
 
-script:WaitForChild("Function").OnServerInvoke = onInvoke
-
-local ready = Instance.new("BoolValue")
-ready.Name = "Ready"
-ready.Value = true
-ready.Parent = script
+local createCom = require(864775860)
+local com = createCom(script, script:WaitForChild("GunInput"), {receiveWR = receiveWR})
+com:setVars({nozzlePoint = nozzlePoint, stats = stats, lasRot = lasRot, lasOff = lasOff})
+com.ready = true
