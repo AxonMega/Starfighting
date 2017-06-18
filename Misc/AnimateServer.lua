@@ -4,13 +4,19 @@ local animate = script.Parent
 local character = animate.Parent
 local humanoid = character:WaitForChild("Humanoid")
 local torso = character:WaitForChild("Torso")
+local hrp = character:WaitForChild("HumanoidRootPart")
 local neck = torso:WaitForChild("Neck")
 local leftShoulder = torso:WaitForChild("Left Shoulder")
 local rightShoulder = torso:WaitForChild("Right Shoulder")
-local hrp = character:WaitForChild("HumanoidRootPart")
 local gyro
 local pi = math.pi
 local startCF = CFrame.new()*CFrame.Angles(pi/2, pi, 0)
+
+humanoid.AutoRotate = false
+local lookPoint = Instance.new("Attachment")
+lookPoint.Name = "LookPoint"
+lookPoint.Position = Vector3.new(0, 1, 0)
+lookPoint.Parent = torso
 
 
 local function empower(givenGyro)
@@ -18,39 +24,15 @@ local function empower(givenGyro)
 	givenGyro.MaxTorque = Vector3.new(0, 20000, 0)
 end
 
-local function onPropChange(_, task, ...)
+local function receive(task, ...)
 	if task == "rotate" then
 		local rotateC, neckC0, leftC0, rightC0 = ...
 		gyro.CFrame = rotateC
 		neck.C0 = neckC0
 		leftShoulder.C0 = leftC0
 		rightShoulder.C0 = rightC0
-	elseif task == "createGyro" then
-		gyro = Instance.new("BodyGyro")
-		gyro.Name = "RotatePower"
-		gyro.CFrame = character.Torso.CFrame
-		gyro.MaxTorque = Vector3.new()
-		gyro.P = 20000
-		gyro.D = 0
-		gyro.Parent = hrp
-		coroutine.resume(coroutine.create(empower), gyro)
-		return gyro
 	elseif task == "unequipTools" then
 		humanoid:UnequipTools()
-	elseif task == "cNone" then
-		humanoid.HipHeight = 0
-		humanoid.WalkSpeed = 16
-		torso:WaitForChild("StayJoint"):Destroy()
-		if ... then
-			local rootJoint = Instance.new("Motor6D")
-			rootJoint.Name = "RootJoint"
-			rootJoint.Part0 = hrp
-			rootJoint.Part1 = torso
-			rootJoint.Parent = hrp
-			rootJoint.C0 = startCF
-			rootJoint.C1 = startCF
-			return rootJoint
-		end
 	elseif task == "resetJoints" then
 		neck.C0 = CFrame.new(0, 1, 0)*CFrame.Angles(pi/2, pi, 0)
 		leftShoulder.C0 = CFrame.new(-1, 0.5, 0)*CFrame.Angles(pi/-2, pi/-2, pi/-2)
@@ -113,11 +95,33 @@ local function onPropChange(_, task, ...)
 	end
 end
 
-animate:WaitForChild("Event").OnServerEvent:Connect(onPropChange)
-animate:WaitForChild("Function").OnServerInvoke = onPropChange
+local function receiveWR(task, ...)
+	if task == "createGyro" then
+		gyro = Instance.new("BodyGyro")
+		gyro.Name = "RotatePower"
+		gyro.CFrame = character.Torso.CFrame
+		gyro.MaxTorque = Vector3.new()
+		gyro.P = 20000
+		gyro.D = 0
+		gyro.Parent = hrp
+		coroutine.resume(coroutine.create(empower), gyro)
+		return gyro
+	elseif task == "cNone" then
+		humanoid.HipHeight = 0
+		humanoid.WalkSpeed = 16
+		torso:WaitForChild("StayJoint"):Destroy()
+		if ... then
+			local rootJoint = Instance.new("Motor6D")
+			rootJoint.Name = "RootJoint"
+			rootJoint.Part0 = hrp
+			rootJoint.Part1 = torso
+			rootJoint.Parent = hrp
+			rootJoint.C0 = startCF
+			rootJoint.C1 = startCF
+			return rootJoint
+		end
+	end
+end
 
-humanoid.AutoRotate = false
-local lookPoint = Instance.new("Attachment")
-lookPoint.Name = "LookPoint"
-lookPoint.Position = Vector3.new(0, 1, 0)
-lookPoint.Parent = torso
+local createCom = require(864775860)
+local com = createCom(script, script.Parent, {receive = receive, receiveWR = receiveWR})
