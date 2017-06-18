@@ -37,7 +37,7 @@ local function onTouched(part)
 	end
 end
 
-local function onInvoke()
+local function receiveWR()
 	canHurt = true
 	sounds[math.random(1, 3)]:Play()
 	tracks[math.random(1, 3)]:Play(0.1, 1, stats.AttackRate.Value)
@@ -47,4 +47,6 @@ local function onInvoke()
 end
 
 bladePart.Touched:Connect(onTouched)
-script:WaitForChild("Function").OnServerInvoke = onInvoke
+
+local createCom = require(864775860)
+local com = createCom(script, script:WaitForChild("SwordInput"), {receiveWR = receiveWR})
