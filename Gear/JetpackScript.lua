@@ -38,8 +38,8 @@ local function activate()
 end
 
 local function deactivate()
-	flyPower.MaxForce = Vector3.new(0, 0, 0)
-	rotatePower.MaxTorque = Vector3.new(0, 0, 0)
+	flyPower.MaxForce = Vector3.new()
+	rotatePower.MaxTorque = Vector3.new()
 	for _, jetGlow in ipairs(jetGlows) do
 		jetGlow.Flames.Enabled = false
 	end
@@ -71,13 +71,13 @@ local function offBack()
 	end
 end
 
-local function onEvent(_, mouseP)
+local function receive(mouseP)
 	local handleP = handle.Position
 	flyPower.Velocity = (mouseP - handleP).unit*speed
 	rotatePower.CFrame = CFrame.new(handleP, mouseP)*rotOffset
 end
 
-local function onInvoke(_, task, mouseP)
+local function receiveWR(task, mouseP)
 	if task == "activate" then
 		activate()
 	elseif task == "deactivate" then
@@ -86,15 +86,10 @@ local function onInvoke(_, task, mouseP)
 		onBack()
 	elseif task == "offBack" then
 		offBack()
-	elseif task == "get" then
-		return handle, flyPower, rotatePower, speed, rotOffset
 	end
 end
 
-script:WaitForChild("Event").OnServerEvent:Connect(onEvent)
-script:WaitForChild("Function").OnServerInvoke = onInvoke
-
-local ready = Instance.new("BoolValue")
-ready.Name = "Ready"
-ready.Value = true
-ready.Parent = script
+local createCom = require(864775860)
+local com = createCom(script, script:WaitForChild("JetpackInput"), {receive = receive, receiveWR = receiveWR})
+com:setVars({handle = handle, flyPower = flyPower, rotatePower = rotatePower, rotOffset = rotOffset, speed = speed})
+com.ready = true
