@@ -1,15 +1,18 @@
 --scripted by AxonMega
 
 local gun = script.Parent.Parent
-local rFunc = gun.GunScript:WaitForChild("Function")
 local ammo = gun:WaitForChild("Ammo")
 local reloading = gun:WaitForChild("Reloading")
-local clipSize = gun:WaitForChild("Stats"):WaitForChild("ClipSize").Value
 local mouse = game.Players.LocalPlayer:GetMouse()
 local equipped = false
 local firing = false
 local canFire = false
-local nozzlePoint, interval, lasRot, lasOff
+local createCom = require(864775860)
+local com = createCom(script, script.Parent)
+
+while not com.ready do wait() end
+local nozzlePoint, stats, lasRot, lasOff = com.nozzlePoint, com.stats, com.lasRot, com.lasOff
+local interval = 1/stats.FireRate.Value
 
 local function isGood()
 	return gun.Enabled and equipped and canFire and not firing and not reloading.Value
@@ -21,7 +24,7 @@ end
 
 local function reload()
 	mouse.Icon = "rbxasset://textures\\gunWaitCursor.png"
-	rFunc:InvokeServer("reload")
+	com:sendWR("reload")
 	if equipped then
 		mouse.Icon = "rbxasset://textures\\gunCursor.png"
 	end
@@ -30,7 +33,7 @@ end
 local function fire()
 	firing = true
 	local mouseP = mouse.Hit.p
-	local laser = rFunc:InvokeServer("fire", mouseP)
+	local laser = com:sendWR("fire", mouseP)
 	local nozzleP = nozzlePoint.WorldPosition
 	laser.CFrame = CFrame.new(nozzlePoint.WorldPosition, mouseP)*lasRot + (mouseP - nozzleP).unit*lasOff
 	local function onTouched(part)
@@ -54,7 +57,7 @@ local function onButton1Down()
 end
 
 local function onInput(input, gpe)
-	if input.KeyCode == Enum.KeyCode.R and isGood() and not gpe and ammo.Value < clipSize then
+	if input.KeyCode == Enum.KeyCode.R and isGood() and not gpe and ammo.Value < stats.ClipSize.Value then
 		reload()
 	end
 end
@@ -75,9 +78,6 @@ local function onUnequipped()
 	canFire = false
 	mouse.Icon = ""
 end
-
-gun.GunScript:WaitForChild("Ready")
-nozzlePoint, interval, lasRot, lasOff = rFunc:InvokeServer("get")
 
 mouse.Button1Down:Connect(onButton1Down)
 game:GetService("UserInputService").InputBegan:Connect(onInput)
