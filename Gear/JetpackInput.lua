@@ -1,16 +1,16 @@
 --scripted by AxonMega
 
 local jetpack = script.Parent.Parent
-local rEvent = jetpack.JetpackScript:WaitForChild("Event")
-local rFunction = jetpack.JetpackScript:WaitForChild("Function")
 local user = game.Players.LocalPlayer
 local mouse = user:GetMouse()
 local equipped = false
 local canActivate = false
 local onBack = false
 local flying = false
-local event1, event2, handle, flyPower, rotatePower, speed, rotOffset
+local createCom = require(864775860)
+local com = createCom(script, script.Parent)
 
+while not com.ready do wait() end
 while not user.Character do wait() end
 local humanoid = user.Character:WaitForChild("Humanoid")
 
@@ -22,10 +22,10 @@ end
 
 local function onMove()
 	local mouseP = mouse.Hit.p
-	rEvent:FireServer(mouseP)
-	local handleP = handle.Position
-	flyPower.Velocity = (mouseP - handleP).unit*speed
-	rotatePower.CFrame = CFrame.new(handleP, mouseP)*rotOffset
+	com:send(mouseP)
+	local handleP = com.handle.Position
+	com.flyPower.Velocity = (mouseP - handleP).unit*com.speed
+	com.rotatePower.CFrame = CFrame.new(handleP, mouseP)*com.rotOffset
 	local target = mouse.Target
 	if target and not target.CanCollide and mouse.TargetFilter ~= target then
 		mouse.TargetFilter = target
@@ -39,7 +39,7 @@ local function onButton1Down()
 			canActivate = false
 			humanoid:ChangeState(Enum.HumanoidStateType.Physics)
 			event2 = mouse.Move:Connect(onMove)
-			rFunction:InvokeServer("activate")
+			com:sendWR("activate")
 		else
 			onBack = true
 			event1 = humanoid.AnimationPlayed:Connect(onAnimationPlayed)
@@ -48,7 +48,7 @@ local function onButton1Down()
 					track:Stop()
 				end
 			end
-			rFunction:InvokeServer("onBack")
+			com:sendWR("onBack")
 		end
 	end
 end
@@ -61,7 +61,7 @@ local function onButton1Up()
 		event2:Disconnect()
 		event2 = nil
 	end
-	rFunction:InvokeServer("deactivate")
+	com:sendWR("deactivate")
 	if not equipped then return end
 	canActivate = true
 end
@@ -78,16 +78,13 @@ local function onUnequipped()
 	canActivate = false
 	mouse.Icon = ""
 	onBack = false
-	rFunction:InvokeServer("offBack")
+	com:sendWR("offBack")
 	onButton1Up()
 	if event1 then
 		event1:Disconnect()
 		event1 = nil
 	end
 end
-
-jetpack.JetpackScript:WaitForChild("Ready")
-handle, flyPower, rotatePower, speed, rotOffset = rFunction:InvokeServer("get")
 
 mouse.Button1Down:Connect(onButton1Down)
 mouse.Button1Up:Connect(onButton1Up)
