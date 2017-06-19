@@ -1,22 +1,23 @@
 --scripted by AxonMega
 
 local spawner = script.Parent.Parent
-local rFunction = spawner.RobotSpawnerScript:WaitForChild("Function")
 local mouse = game.Players.LocalPlayer:GetMouse()
 local equipped = false
 local canSpawn = false
+local createCom = require(864775860)
+local com = createCom(script, script.Parent)
 
 local function onButton1Down()
 	if spawner.Enabled and equipped and canSpawn then
 		canSpawn = false
-		rFunction:InvokeServer("spawn")
+		com:sendWR("spawn")
 		canSpawn = true
 	end
 end
 
 local function onInput(input, gpe)
 	if equipped and not gpe and input.KeyCode == Enum.KeyCode.R then
-		rFunction:InvokeServer("despawn")
+		com:sendWR("despawn")
 	end
 end
 
