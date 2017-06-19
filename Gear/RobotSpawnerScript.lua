@@ -28,7 +28,7 @@ local function deactivate()
 	end
 end
 
-local function onInvoke(_, task)
+local function receiveWR(task)
 	if task == "spawn" then
 		if #robots >= stats.RobotCount.Value then return end
 		activate()
@@ -66,4 +66,5 @@ local function onInvoke(_, task)
 	end
 end
 
-script:WaitForChild("Function").OnServerInvoke = onInvoke
+local createCom = require(864775860)
+local com = createCom(script, script:WaitForChild("RobotSpawnerInput"), {receiveWR = receiveWR})
