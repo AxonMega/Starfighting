@@ -46,7 +46,7 @@ local retroSound = com.engine.RetroSound
 
 local thrusters, retroThrusters, lightTurrets, heavyTurrets, glowParts = ship.GetObjects:Invoke()
 
-local normColor = ship.Pilot.Value.TeamColor.Color
+local normColor = ship.Color.Value.Color
 local lightColor = Color3.new(normColor.r + 0.4, normColor.g + 0.4, normColor.b + 0.4)
 local maxForce = Vector3.new(2000000, 2000000, 2000000)
 local noForce = Vector3.new()
