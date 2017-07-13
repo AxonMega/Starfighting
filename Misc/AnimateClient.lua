@@ -356,6 +356,9 @@ end
 
 local function onJumpRequest()
 	com:send("removeSeatWeld")
+	if torso:FindFirstChild("SeatWeld") then
+		torso.SeatWeld:Destroy()
+	end
 end
 
 local function onTorsoChildAdded(child)
