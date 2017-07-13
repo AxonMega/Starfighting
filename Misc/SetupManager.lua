@@ -21,35 +21,29 @@ local lightTurrets = {}
 local heavyTurrets = {}
 local glowParts = {}
 
-local function join(part0, part1)
-	local weld = Instance.new("Weld")
-	weld.Part0 = part0
-	weld.Part1 = part1
-	weld.C0 = part0.CFrame:toObjectSpace(part1.CFrame)
-	weld.Parent = part0
-end
-
 local function returnObjects()
 	return thrusters, retroThrusters, lightTurrets, heavyTurrets, glowParts
 end
 
 while #stats:GetChildren() < 7 do wait() end
+Instance.new("BrickColorValue", ship).Name = "Color"
 Instance.new("BoolValue", ship).Name = "SetupFinished"
 Instance.new("BoolValue", ship).Name = "EngineOn"
 Instance.new("BoolValue", ship).Name = "CockpitOn"
 Instance.new("BoolValue", ship).Name = "LandingGearOn"
 Instance.new("IntValue", ship).Name = "Health"
-Instance.new("RemoteFunction", ship).Name = "GetObjects"
+Instance.new("BindableFunction", ship).Name = "GetObjects"
+Instance.new("BindableEvent", ship).Name = "CutPower"
+Instance.new("BindableEvent", ship).Name = "TakeDamage"
 Instance.new("RemoteEvent", ship).Name = "ToggleCockpit"
 Instance.new("RemoteEvent", ship).Name = "ToggleLandingGear"
-Instance.new("RemoteEvent", ship).Name = "CutPower"
-Instance.new("RemoteEvent", ship).Name = "TakeDamage"
+ship.Color.Value = pilot.TeamColor
 ship.CockpitOn.Value = true
 ship.Health.Value = stats.MaxHealth.Value
-while #ship:GetChildren() < stats.ChildCount.Value do wait() end
+while #ship:GetChildren() < stats.ChildCount.Value + 12 do wait() end
 while #parts:GetChildren() < stats.PartCount.Value do wait() end
 for _, child in ipairs(parts:GetChildren()) do
-	join(engine, child)
+	shared.join(engine, child)
 	child.Anchored = false
 	if child.Name == "GlowPart" then
 		table.insert(glowParts, child)
@@ -75,12 +69,16 @@ for _, child in ipairs(ship:GetChildren()) do
 		table.insert(glowParts, turret.GlowPart)
 	end
 end
-ship.GetObjects.OnServerInvoke = returnObjects
+ship.GetObjects.OnInvoke = returnObjects
 mods.setupPilotChair(ship, pilot)
 mods.setupControlComputer(ship)
 mods.setupCockpit(ship, pilot)
-mods.colorChange(ship, pilot.TeamColor)
-mods.setupLandingGear(landingLegs, ship, pilot)
-mods.setupEngine(engine)
+mods.colorChange(ship, ship.Color.Value)
+mods.setupLandingGear(ship, landingLegs, pilot)
+mods.setupEngine(ship)
 mods.shipHealth(ship, pilot)
+local nameLabel = ship:FindFirstChild("NameLabel", true)
+if nameLabel then
+	nameLabel:WaitForChild("PlayerName").Text = pilot.Name .. "'s Starfighter"
+end
 ship.SetupFinished.Value = true
