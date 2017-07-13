@@ -7,8 +7,9 @@ local mouse = game.Players.LocalPlayer:GetMouse()
 local equipped = false
 local firing = false
 local canFire = false
-local createCom = require(864775860)
-local com = createCom(script, script.Parent)
+
+while not shared.createCom do wait() end
+local com = shared.createCom(script, script.Parent)
 
 while not com.ready do wait() end
 local interval = 1/com.stats.FireRate.Value
@@ -34,7 +35,9 @@ local function fire()
 	local mouseP = mouse.Hit.p
 	local laser = com:sendWR("fire", mouseP)
 	local nozzleP = com.nozzlePoint.WorldPosition
-	laser.CFrame = CFrame.new(nozzleP, mouseP)*com.lasRot + (mouseP - nozzleP).unit*com.lasOff
+	local dir = (mouseP - nozzleP).unit
+	laser.CFrame = CFrame.new(nozzleP, mouseP)*com.lasRot + dir*com.lasOff
+	laser.FlyPower.Velocity = dir*com.stats.ProjectileSpeed.Value
 	local function onTouched(part)
 		if isBad(part) or part:IsDescendantOf(gun) then return end
 		laser.Transparency = 1
