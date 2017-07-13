@@ -43,7 +43,7 @@ local function receiveWR(task, mouseP)
 	end
 end
 
-local createCom = require(864775860)
-local com = createCom(script, script:WaitForChild("GunInput"), {receiveWR = receiveWR})
+while not shared.createCom do wait() end
+local com = shared.createCom(script, script:WaitForChild("GunInput"), {receiveWR = receiveWR})
 com:setVars({nozzlePoint = nozzlePoint, stats = stats, lasRot = lasRot, lasOff = lasOff})
 com.ready = true
