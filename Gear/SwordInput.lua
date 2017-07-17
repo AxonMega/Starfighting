@@ -5,8 +5,9 @@ local mouse = game.Players.LocalPlayer:GetMouse()
 local equipped = false
 local striking = false
 local canStrike = false
-local createCom = require(864775860)
-local com = createCom(script, script.Parent)
+
+while not shared.createCom do wait() end
+local com = shared.createCom(script, script.Parent)
 
 local function isGood()
 	return sword.Enabled and equipped and canStrike and not striking
