@@ -1,16 +1,15 @@
 --scripted by AxonMega
 
-local animate = script.Parent
-local character = animate.Parent
+local character = script.Parent.Parent
 local humanoid = character:WaitForChild("Humanoid")
 local torso = character:WaitForChild("Torso")
 local hrp = character:WaitForChild("HumanoidRootPart")
 local neck = torso:WaitForChild("Neck")
 local leftShoulder = torso:WaitForChild("Left Shoulder")
 local rightShoulder = torso:WaitForChild("Right Shoulder")
-local gyro
 local pi = math.pi
 local startCF = CFrame.new()*CFrame.Angles(pi/2, pi, 0)
+local gyro
 
 humanoid.AutoRotate = false
 local lookPoint = Instance.new("Attachment")
@@ -18,10 +17,9 @@ lookPoint.Name = "LookPoint"
 lookPoint.Position = Vector3.new(0, 1, 0)
 lookPoint.Parent = torso
 
-
-local function empower(givenGyro)
+local function enableGyro()
 	wait(0.5)
-	givenGyro.MaxTorque = Vector3.new(0, 20000, 0)
+	gyro.MaxTorque = Vector3.new(0, 20000, 0)
 end
 
 local function receive(task, ...)
@@ -79,10 +77,10 @@ local function receive(task, ...)
 		if currentTool then
 			currentTool.Enabled = true
 		end
-	elseif task == "removeSeatWeld" then
-		if torso:FindFirstChild("SeatWeld") then
-			torso.SeatWeld:Destroy()
-		end
+	elseif task == "disableGyro" then
+		gyro.MaxTorque = Vector3.new()
+	elseif task == "enableGyro" then
+		coroutine.resume(coroutine.create(enableGyro))
 	elseif task == "newJoint" then
 		local jointType, joint = ...
 		if jointType == "neck" then
@@ -104,7 +102,7 @@ local function receiveWR(task, ...)
 		gyro.P = 20000
 		gyro.D = 0
 		gyro.Parent = hrp
-		coroutine.resume(coroutine.create(empower), gyro)
+		coroutine.resume(coroutine.create(enableGyro))
 		return gyro
 	elseif task == "cNone" then
 		humanoid.HipHeight = 0
@@ -123,5 +121,5 @@ local function receiveWR(task, ...)
 	end
 end
 
-local createCom = require(864775860)
-local com = createCom(script, script.Parent, {receive = receive, receiveWR = receiveWR})
+while not shared.createCom do wait() end
+local com = shared.createCom(script, script.Parent, {receive = receive, receiveWR = receiveWR})
