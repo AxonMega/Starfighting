@@ -3,10 +3,9 @@
 local spawner = script.Parent
 local user = spawner.Parent.Parent
 local stats = spawner:WaitForChild("Stats")
-local rStorage = game.ReplicatedStorage
-local setupSpawner = require(rStorage:WaitForChild("ModuleScripts"):WaitForChild("SetupSpawner"))
-local baseRobot = rStorage:WaitForChild("Npcs"):WaitForChild(string.gsub(spawner.Name, " Spawner", ""))
-local baseScript = rStorage:WaitForChild("Scripts"):WaitForChild("RobotAI")
+local setupSpawner = require(game.ServerScriptService:WaitForChild("GearModules"):WaitForChild("SetupSpawner"))
+local baseRobot = game.ServerStorage:WaitForChild("Npcs"):WaitForChild(string.gsub(spawner.Name, " Spawner", ""))
+local baseScript = game.ServerStorage:WaitForChild("Scripts"):WaitForChild("RobotAI")
 local despawning = false
 local robots = {}
 
@@ -66,5 +65,5 @@ local function receiveWR(task)
 	end
 end
 
-local createCom = require(864775860)
-local com = createCom(script, script:WaitForChild("RobotSpawnerInput"), {receiveWR = receiveWR})
+while not shared.createCom do wait() end
+local com = shared.createCom(script, script:WaitForChild("RobotSpawnerInput"), {receiveWR = receiveWR})
