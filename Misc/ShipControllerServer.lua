@@ -41,6 +41,7 @@ com.lasRotOffset = CFrame.Angles(0, math.pi/2, 0)
 
 local retroOn = false
 local hum = com.engine.Hum
+local pitchChange = hum.PitchChange
 local jetSound = com.engine.JetSound
 local retroSound = com.engine.RetroSound
 
@@ -56,9 +57,9 @@ local turretStats = {
 	lightOn = ship.Controls.E.Value ~= "None"
 }
 
-local modFolder = game.ReplicatedStorage.ModuleScripts
-local createLaser = require(modFolder.CreateLaser)
-local enableLaser = require(modFolder.EnableLaser)
+local modFolder = game.ServerScriptService.GearModules
+local createLaser = require(modFolder:WaitForChild("CreateLaser"))
+local enableLaser = require(modFolder:WaitForChild("EnableLaser"))
 
 local projFolder = workspace["-Projectiles-"]
 
@@ -134,8 +135,10 @@ local function stopMove() --stops the ship's motion
 	jetSound.PlaybackSpeed = 0.5
 	jetSound.Volume = 0.5
 	for _, thruster in ipairs(thrusters) do
-		thruster.JetGlow.Flames.Rate = 0
-		thruster.JetGlow.Flames.Enabled = false
+		if thruster:FindFirstChild("JetGlow") then
+			thruster.JetGlow.Flames.Rate = 0
+			thruster.JetGlow.Flames.Enabled = false
+		end
 	end
 	coroutine.resume(coroutine.create(flameOff))
 	if currentRetroOn then
@@ -331,7 +334,7 @@ local function togglePower() --toggles whether the ship is on or off
 		for i = 1, 40 do
 			if com.engineOn.Value or not com.canChange then break end
 			hum.Volume = 1 - i/40
-			hum.PitchChange.Octave = 2 - i/20
+			pitchChange.Octave = 2 - i/20
 			wait(0.05)
 		end
 		hum:Stop()
@@ -344,7 +347,7 @@ local function togglePower() --toggles whether the ship is on or off
 		for i = 1, 40 do
 			if not com.engineOn.Value or not com.canChange then break end
 			hum.Volume = i/40
-			hum.PitchChange.Octave = i/20
+			pitchChange.Octave = i/20
 			wait(0.05)
 		end
 	end
