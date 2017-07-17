@@ -5,14 +5,18 @@ local pilot = ship:WaitForChild("Pilot").Value
 local stats = ship:WaitForChild("Stats")
 local parts = ship:WaitForChild("Parts")
 local engine = ship:WaitForChild("Engine")
-local modFolder = game.ServerScriptService.ModuleScripts
+local modFolder = game.ServerScriptService.ShipModules
 local mods = {
-	setupLandingLeg = require(modFolder.SetupLandingLeg), setupThruster = require(modFolder.SetupThruster),
-	setupGunPort = require(modFolder.SetupGunPort), setupPilotChair = require(modFolder.SetupPilotChair),
-	setupPilotChair = require(modFolder.SetupPilotChair), setupControlComputer = require(modFolder.SetupControlComputer),
-	setupCockpit = require(modFolder.SetupCockpit), colorChange = require(modFolder.ColorChange),
-	colorChange = require(modFolder.ColorChange), setupLandingGear = require(modFolder.SetupLandingGear),
-	setupEngine = require(modFolder.SetupEngine), shipHealth = require(modFolder.ShipHealth)
+	setupLandingLeg = require(modFolder.SetupLandingLeg),
+	setupThruster = require(modFolder.SetupThruster),
+	setupGunPort = require(modFolder.SetupGunPort),
+	setupPilotSeat = require(modFolder.SetupPilotSeat),
+	setupControlComputer = require(modFolder.SetupControlComputer),
+	setupCockpit = require(modFolder.SetupCockpit),
+	colorChange = require(modFolder.ColorChange),
+	setupLandingGear = require(modFolder.SetupLandingGear),
+	setupEngine = require(modFolder.SetupEngine),
+	shipHealth = require(modFolder.ShipHealth)
 }
 local landingLegs = {}
 local thrusters = {}
@@ -70,7 +74,7 @@ for _, child in ipairs(ship:GetChildren()) do
 	end
 end
 ship.GetObjects.OnInvoke = returnObjects
-mods.setupPilotChair(ship, pilot)
+mods.setupPilotSeat(ship, pilot)
 mods.setupControlComputer(ship)
 mods.setupCockpit(ship, pilot)
 mods.colorChange(ship, ship.Color.Value)
