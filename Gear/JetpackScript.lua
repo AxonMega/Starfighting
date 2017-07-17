@@ -3,7 +3,7 @@
 local jetpack = script.Parent
 local user = jetpack.Parent.Parent
 local stats = jetpack:WaitForChild("Stats")
-local setupJetpack= require(game.ReplicatedStorage:WaitForChild("ModuleScripts"):WaitForChild("SetupJetpack"))
+local setupJetpack= require(game.ServerScriptService:WaitForChild("GearModules"):WaitForChild("SetupJetpack"))
 local rotOffset = CFrame.Angles(math.pi/2, 0, math.pi)
 local glowLerp = 0
 
@@ -89,7 +89,7 @@ local function receiveWR(task, mouseP)
 	end
 end
 
-local createCom = require(864775860)
-local com = createCom(script, script:WaitForChild("JetpackInput"), {receive = receive, receiveWR = receiveWR})
+while not shared.createCom do wait() end
+local com = shared.createCom(script, script:WaitForChild("JetpackInput"), {receive = receive, receiveWR = receiveWR})
 com:setVars({handle = handle, flyPower = flyPower, rotatePower = rotatePower, rotOffset = rotOffset, speed = speed})
 com.ready = true
