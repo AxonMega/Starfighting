@@ -7,8 +7,9 @@ local equipped = false
 local canActivate = false
 local onBack = false
 local flying = false
-local createCom = require(864775860)
-local com = createCom(script, script.Parent)
+
+while not shared.createCom do wait() end
+local com = shared.createCom(script, script.Parent)
 
 while not com.ready do wait() end
 while not user.Character do wait() end
@@ -56,7 +57,7 @@ end
 local function onButton1Up()
 	if not flying then return end
 	flying = false
-	humanoid:ChangeState(Enum.HumanoidStateType.Landed)
+	humanoid:ChangeState(Enum.HumanoidStateType.Freefall)
 	if event2 then
 		event2:Disconnect()
 		event2 = nil
