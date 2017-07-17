@@ -2,13 +2,11 @@
 
 local sword = script.Parent
 local stats = sword:WaitForChild("Stats")
-local setupSword = require(game.ReplicatedStorage:WaitForChild("ModuleScripts"):WaitForChild("SetupSword"))
+local setupSword = require(game.ServerScriptService:WaitForChild("GearModules"):WaitForChild("SetupSword"))
 local user = sword.Parent.Parent
 local canHurt = false
 local hit = false
 local tracks = {}
-local passcodeDamage = "secret"
-local passcodeDied = "secret"
 
 while #stats:GetChildren() < 4 do wait() end
 while #sword:GetChildren() < stats.ChildCount.Value do wait() end
@@ -30,10 +28,9 @@ local function onTouched(part)
 	hit = true
 	bladePart.HitSound:Play()
 	bladePart.Sparks:Emit(sparkCount)
-	local parent = part.Parent
-	local remote = parent:FindFirstChild("TakeDamageS")
+	local remote = part.Parent:FindFirstChild("TakeDamage") or part.Parent.Parent:FindFirstChild("TakeDamage")
 	if remote then
-		remote:Fire(stats.Damage.Value, passcodeDamage)
+		remote:Fire(user, stats.Damage.Value)
 	end
 end
 
@@ -48,5 +45,5 @@ end
 
 bladePart.Touched:Connect(onTouched)
 
-local createCom = require(864775860)
-local com = createCom(script, script:WaitForChild("SwordInput"), {receiveWR = receiveWR})
+while not shared.createCom do wait() end
+local com = shared.createCom(script, script:WaitForChild("SwordInput"), {receiveWR = receiveWR})
