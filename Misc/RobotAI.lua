@@ -8,7 +8,7 @@ local head = player.Character.Head
 local humanoid = player.Character.Humanoid
 local stats = robot:WaitForChild("Stats")
 local projFolder = workspace:WaitForChild("-Projectiles-")
-local modFolder = game.ReplicatedStorage:WaitForChild("ModuleScripts")
+local modFolder = game.ServerScriptService:WaitForChild("GearModules")
 local setupRobot = require(modFolder:WaitForChild("SetupRobot"))
 local createLaser = require(modFolder:WaitForChild("CreateLaser"))
 local enableLaser = require(modFolder:WaitForChild("EnableLaser"))
@@ -22,22 +22,22 @@ local hoverDir = 1
 local target, targetTorso
 local lastFire = 0
 local lasRot = CFrame.Angles(0, math.pi/2, 0)
-local passcodeDamage = "secret"
+local myColor = player.TeamColor
 
 math.randomseed(tick())
 
 while #stats:GetChildren() < 5 do wait() end
 while #robot:GetChildren() < stats.ChildCount.Value do wait() end
 local nozzlePoint = robot.Body:WaitForChild("NozzlePoint")
-local glowParts, flyPower, rotatePower, hum, fireSound = setupRobot(robot, player.TeamColor, stats.FireRate.Value)
+local glowParts, flyPower, rotatePower, hum, fireSound = setupRobot(robot, myColor, stats.FireRate.Value)
 local baseLaser, baseEffect = createLaser(player.TeamColor, stats.Damage.Value, stats.ProjectileSpeed.Value)
 
 hum:Play()
 
 local healthBar = robot.HealthDisplay:WaitForChild("HealthBar")
 
-local function onDamaged(enemy, damage, passcode)
-	if enemy.TeamColor == player.TeamColor or health == 0 or passcode ~= passcodeDamage then return end
+local function onDamaged(enemy, damage)
+	if enemy.TeamColor == myColor or health == 0 then return end
 	health = math.max(health - damage, 0)
 	if health == 0 then
 		healthBar.Visible = false
@@ -46,8 +46,7 @@ local function onDamaged(enemy, damage, passcode)
 	end
 end
 
-robot.TakeDamageC.OnServerEvent:Connect(onDamaged)
-robot.TakeDamageS.Event:Connect(onDamaged)
+robot.TakeDamage.Event:Connect(onDamaged)
 
 local function randOffset()
 	return Vector3.new(math.random(-40, 40)/10, math.random(40, 60)/10, math.random(-40, 40)/10)
