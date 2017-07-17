@@ -15,26 +15,20 @@ local bodyparts = {
 	["Left Leg"] = {"Left Hip", Vector3.new(0, 1, 0), Vector3.new(-0.5, -1, 0), Vector3.new(0, 0, -90)},
 	["Right Leg"] = {"Right Hip", Vector3.new(0, 1, 0), Vector3.new(0.5, -1, 0), Vector3.new(0, 0, -90)}
 }
-local passcodeDamage = "secret"
-local passcodeDied = "secret"
 
-local takeDamageC = Instance.new("RemoteEvent")
-takeDamageC.Name = "TakeDamageC"
-takeDamageC.Parent = character
-local takeDamageS = Instance.new("BindableEvent")
-takeDamageS.Name = "TakeDamageS"
-takeDamageS.Parent = character
+local takeDamage = Instance.new("BindableEvent")
+takeDamage.Name = "TakeDamage"
+takeDamage.Parent = character
 
-local function onTakeDamageRequest(enemy, damage, passcode)
-	if enemy.TeamColor == player.TeamColor or humanoid.Health <= 0 or passcode ~= passcodeDamage then return end
+local function onTakeDamageRequest(enemy, damage)
+	if enemy.TeamColor == player.TeamColor or humanoid.Health <= 0  then return end
 	humanoid:TakeDamage(damage)
 	if humanoid.Health <= 0 then
-		workspace["-PlayerDied-"]:Fire(enemy, player, passcodeDied)
+		workspace["-Messaging-"].PlayerDied:Fire(enemy, player)
 	end
 end
 
-takeDamageC.OnServerEvent:Connect(onTakeDamageRequest)
-takeDamageS.Event:Connect(onTakeDamageRequest)
+takeDamage.Event:Connect(onTakeDamageRequest)
 
 game:GetService("ContentProvider"):Preload(deadFace)
 torso.CustomPhysicalProperties = cpp
