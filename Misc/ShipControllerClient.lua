@@ -17,7 +17,7 @@ local rs = game:GetService("RunService")
 
 while not ship.SetupFinished.Value do wait() end
 
-local guiFolder = game.ReplicatedStorage.Guis
+local guiFolder = game.ReplicatedStorage.LocalGuis
 
 local toggleCockpit = ship.ToggleCockpit
 local toggleLandingGear = ship.ToggleLandingGear
