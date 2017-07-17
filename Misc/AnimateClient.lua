@@ -11,6 +11,7 @@ local leftShoulder = torso:WaitForChild("Left Shoulder")
 local rightShoulder = torso:WaitForChild("Right Shoulder")
 local rootJoint = hrp:WaitForChild("RootJoint")
 local uis = game:GetService("UserInputService")
+local gyroOn = true
 local sprinting = false
 local canChange = true
 local currentAnim, currentTool, lastTool
@@ -19,12 +20,14 @@ local stance = "standing"
 local pi = math.pi
 local r1 = CFrame.Angles(pi/-2, pi/-2, pi/-2)
 local r2 = CFrame.Angles(pi/-2, pi/2, pi/2)
+
 local neckP = CFrame.new(neck.C0.p)
 local leftP = CFrame.new(leftShoulder.C0.p)
 local rightP = CFrame.new(rightShoulder.C0.p)
 local lookPoint = torso:WaitForChild("LookPoint")
-local createCom = require(864775860)
-local com = createCom(script, script:WaitForChild("PropertyChanger"))
+
+while not shared.createCom do wait() end
+local com = shared.createCom(script, script:WaitForChild("ServerAnimate"))
 
 local function loadAnim(name, id)
 	local animation = Instance.new("Animation")
@@ -54,7 +57,7 @@ currentAnim = idleTrack
 currentToolAnim = toolTrack1
 idleTrack:Play()
 
-local rotatePower = com:sendWR("createGyro")
+local gyro = com:sendWR("createGyro")
 
 local function togglePack(enabled)
 	if not enabled then
@@ -198,9 +201,10 @@ local function onStateChanged(old, new)
 		end
 	end
 	if not isGoodState(new) then
-		if rotatePower then
-			rotatePower:Destroy()
-			rotatePower = nil
+		if gyroOn then
+			gyroOn = false
+			com:send("disableGyro")
+			gyro.MaxTorque = Vector3.new()
 		end
 		if moveEvent then
 			moveEvent:Disconnect()
@@ -222,9 +226,9 @@ local function onStateChanged(old, new)
 		if old == Enum.HumanoidStateType.Seated then
 			togglePack(true)
 		end
-		rotatePower = hrp:FindFirstChild("RotatePower")
-		if not rotatePower then
-			rotatePower = com:sendWR("createGyro")
+		if not gyroOn then
+			gyroOn = true
+			com:send("enableGyro")
 		end
 		if not moveEvent then
 			moveEvent = mouse.Move:Connect(rotate)
@@ -354,13 +358,6 @@ local function onInputEnded(input, gpe)
 	end
 end
 
-local function onJumpRequest()
-	com:send("removeSeatWeld")
-	if torso:FindFirstChild("SeatWeld") then
-		torso.SeatWeld:Destroy()
-	end
-end
-
 local function onTorsoChildAdded(child)
 	if child:IsA("Motor6D") then
 		if child.Name == "Neck" then
@@ -396,7 +393,6 @@ character.ChildAdded:Connect(onChildAdded)
 character.ChildRemoved:Connect(onChildRemoved)
 uis.InputBegan:Connect(onInputBegan)
 uis.InputEnded:Connect(onInputEnded)
-uis.JumpRequest:Connect(onJumpRequest)
 torso.ChildAdded:Connect(onTorsoChildAdded)
 
 for _, child in ipairs(character:GetChildren()) do
