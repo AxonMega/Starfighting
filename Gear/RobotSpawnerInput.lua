@@ -4,8 +4,9 @@ local spawner = script.Parent.Parent
 local mouse = game.Players.LocalPlayer:GetMouse()
 local equipped = false
 local canSpawn = false
-local createCom = require(864775860)
-local com = createCom(script, script.Parent)
+
+while not shared.createCom do wait() end
+local com = shared.createCom(script, script.Parent)
 
 local function onButton1Down()
 	if spawner.Enabled and equipped and canSpawn then
