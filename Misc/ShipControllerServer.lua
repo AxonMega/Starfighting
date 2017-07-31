@@ -12,7 +12,7 @@ while not ship.SetupFinished.Value do wait() end
 local pilot = ship.Pilot.Value
 
 local controlComputer = ship.ControlComputer
-local screen = controlComputer.ControlPanel.Screen
+local screen = controlComputer.ControlPanel.ShipScreen
 
 com.canChange = true
 
@@ -98,8 +98,10 @@ local function startMove() --starts the ship's motion
 	com.jetPower.MaxForce = maxForce
 	com.rotatePower.MaxTorque = maxForce
 	for _, thruster in ipairs(thrusters) do
-		thruster.JetGlow.Flames.Rate = 0
-		thruster.JetGlow.Flames.Enabled = true
+		if not bad(thruster) then
+			thruster.JetGlow.Flames.Rate = 0
+			thruster.JetGlow.Flames.Enabled = true
+		end
 	end
 	jetSound:Play()
 	coroutine.resume(coroutine.create(flameOn))
@@ -135,7 +137,7 @@ local function stopMove() --stops the ship's motion
 	jetSound.PlaybackSpeed = 0.5
 	jetSound.Volume = 0.5
 	for _, thruster in ipairs(thrusters) do
-		if thruster:FindFirstChild("JetGlow") then
+		if not bad(thruster) then
 			thruster.JetGlow.Flames.Rate = 0
 			thruster.JetGlow.Flames.Enabled = false
 		end
@@ -155,7 +157,9 @@ local function activateRetro() --turns on the retro thrusters
 		com.jetPower.MaxForce = maxForce
 	end
 	for _, thruster in ipairs(retroThrusters) do
-		thruster.JetGlow.Flames.Enabled = true
+		if not bad(thruster) then
+			thruster.JetGlow.Flames.Enabled = true
+		end
 	end
 	for i = 1, 3 do
 		for _, thruster in ipairs(retroThrusters) do
@@ -176,7 +180,9 @@ local function deactivateRetro() --turns off the retro thrusters
 		com.jetPower.MaxForce = noForce
 	end
 	for _, thruster in ipairs(retroThrusters) do
-		thruster.JetGlow.Flames.Enabled = false
+		if not bad(thruster) then
+			thruster.JetGlow.Flames.Enabled = false
+		end
 	end
 	for i = 1, 3 do
 		for _, thruster in ipairs(retroThrusters) do
@@ -188,8 +194,11 @@ local function deactivateRetro() --turns off the retro thrusters
 end
 
 local function updateThrusters() --changes the magnitude of the thrusters relative to the ship's speed
+	local inc = com.acceleration*5
 	for _, thruster in ipairs(thrusters) do
-		thruster.JetGlow.Flames.Rate = thruster.JetGlow.Flames.Rate + com.acceleration*5
+		if not bad(thruster) then
+			thruster.JetGlow.Flames.Rate = thruster.JetGlow.Flames.Rate + inc
+		end
 	end
 	jetSound.PlaybackSpeed = 0.5 + (com.speed/com.maxSpeed)*1.5
 	jetSound.Volume = 0.5 + (com.speed/com.maxSpeed)*0.5
@@ -255,7 +264,8 @@ if hTurret1 then
 end
 
 local function fireTurret(turret, laser, effect, damage, projSpeed) --causes the given turret to fire
-	local charge = turret.Charge
+	local charge = turret:FindFirstChild("Charge")
+	if not charge then return end
 	charge.Fire:Play()
 	local pos = charge.NozzlePoint.WorldPosition
 	local dir = charge.NozzlePoint.WorldAxis
@@ -359,30 +369,30 @@ local function onPowerCutRequest(reason) --called when the pilot ejects or the s
 			com:send("crash")
 			togglePower()
 		end
-		return
-	elseif reason == "ejected" then
-		if com.engineOn.Value then
-			com:send("eject", true)
-			stopFunctions()
-		else
-			com:send("eject", false)
-			resetButtons()
-		end
 	elseif reason == "destroyed" then
 		if com.engineOn.Value then
+			com:sendWR("destroy")
 			togglePower()
 		else
 			resetButtons()
 		end
+	elseif reason == "ejected" then
+		com.canChange = false
+		com:sendWR("eject")
+		if com.engineOn.Value then
+			stopFunctions()
+		else
+			resetButtons()
+		end
 	end
-	com:send("removeGuis")
+	if reason == "crashed" then return end
 	wait(0.2)
 	script:Destroy()
 end
 
 --COMMUNICATION
 
-local function receive(task, ...)
+local function receive(task, ...) --receives messages from the client
 	if task == "move" then
 		move(...)
 	elseif task == "buttonDown" then
@@ -408,7 +418,7 @@ local function receive(task, ...)
 	end
 end
 
-local function receiveWR(task)
+local function receiveWR(task) --receives messages from the server and sends responses
 	if task == "fireHeavy" then
 		return fireHeavy()
 	elseif task == "fireLight" then
